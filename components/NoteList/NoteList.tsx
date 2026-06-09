@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 import Link from 'next/link';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -30,7 +30,8 @@ export default function NoteList({ notes }: NoteListProps) {
           <div className={css.footer}>
             <span className={css.tag}>{note.tag}</span>
 
-            <Link href={`/notes/${note.id}`} className={css.link}>
+            {/* Ось тут scroll={false}! */}
+            <Link href={`/notes/${note.id}`} className={css.link} scroll={false}>
               View details
             </Link>
 

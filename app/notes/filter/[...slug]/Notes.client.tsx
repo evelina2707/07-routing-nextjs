@@ -1,10 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import {
-  keepPreviousData,
-  useQuery,
-} from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { fetchNotes } from '@/lib/api';
 import NoteList from '@/components/NoteList/NoteList';
 import SearchBox from '@/components/SearchBox/SearchBox';
@@ -13,7 +10,11 @@ import NoteForm from '@/components/NoteForm/NoteForm';
 import Modal from '@/components/Modal/Modal';
 import css from '@/components/NotesPage/NotesPage.module.css';
 
-export default function NotesClient() {
+type Props = {
+  tag?: string;
+};
+
+export default function NotesClient({ tag }: Props) {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -25,41 +26,41 @@ export default function NotesClient() {
       setPage(1);
     }, 300);
 
-    return () => {
-      window.clearTimeout(timeoutId);
-    };
+    return () => window.clearTimeout(timeoutId);
   }, [search]);
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['notes', page, debouncedSearch],
+    queryKey: ['notes', page, debouncedSearch, tag],
     queryFn: () =>
-      fetchNotes({ page, search: debouncedSearch, perPage: 12 }),
+      fetchNotes({
+        page,
+        search: debouncedSearch,
+        perPage: 12,
+        tag,
+      }),
     placeholderData: keepPreviousData,
   });
+  console.log('tag:', tag);
+console.log('data from fetchNotes:', data);
 
   const handleSearchChange = (value: string) => {
     setSearch(value);
   };
 
-  if (isLoading) {
-    return <p>Loading, please wait...</p>;
-  }
-
-  if (error) {
-    return <p>Something went wrong.</p>;
-  }
+  if (isLoading) return <p>Loading, please wait...</p>;
+  if (error) return <p>Something went wrong.</p>;
+  if (!data || !Array.isArray(data.notes)) return <p>No notes found.</p>;
 
   return (
     <main className={css.app}>
       <div className={css.toolbar}>
         <SearchBox onChange={handleSearchChange} />
-
         <button className={css.button} onClick={() => setIsModalOpen(true)}>
           Create note +
         </button>
       </div>
 
-      {data && data.totalPages > 1 && (
+      {data.totalPages > 1 && (
         <Pagination
           currentPage={page}
           pageCount={data.totalPages}
@@ -67,7 +68,7 @@ export default function NotesClient() {
         />
       )}
 
-      {data?.notes?.length ? (
+      {data.notes.length ? (
         <NoteList notes={data.notes} />
       ) : (
         <p>No notes found.</p>

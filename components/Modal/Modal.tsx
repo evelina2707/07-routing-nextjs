@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { MouseEvent, ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import css from './Modal.module.css';
@@ -11,7 +11,11 @@ interface ModalProps {
 }
 
 export default function Modal({ children, onClose }: ModalProps) {
+  const [isClient, setIsClient] = useState(false);
+
   useEffect(() => {
+    const id = setTimeout(() => setIsClient(true), 0);
+
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
@@ -26,6 +30,7 @@ export default function Modal({ children, onClose }: ModalProps) {
     return () => {
       document.body.style.overflow = previousOverflow;
       document.removeEventListener('keydown', handleKeyDown);
+      clearTimeout(id);
     };
   }, [onClose]);
 
@@ -34,6 +39,8 @@ export default function Modal({ children, onClose }: ModalProps) {
       onClose();
     }
   };
+
+  if (!isClient) return null;
 
   return createPortal(
     <div
