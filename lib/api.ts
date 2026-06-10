@@ -29,7 +29,7 @@ export async function fetchNotes({
   perPage,
   tag,
 }: FetchNotesParams): Promise<FetchNotesResponse> {
-  const { data } = await api.get('/notes', {
+  const { data } = await api.get<FetchNotesResponse>('/notes', {
     params: {
       page,
       perPage,
@@ -58,16 +58,3 @@ export async function fetchNoteById(id: string): Promise<Note> {
   const { data } = await api.get<Note>(`/notes/${id}`);
   return data;
 }
-
-export type Category = {
-  id: string;
-  name: string;
-  description: string;
-  createdAt: string;
-  updatedAt: string;
-};
-
-export const getCategories = async () => {
-  const res = await axios<Category[]>('/categories');
-  return res.data;
-};
