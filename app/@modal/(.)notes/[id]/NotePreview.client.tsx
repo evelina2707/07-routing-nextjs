@@ -22,17 +22,27 @@ export default function NotePreviewClient({ id }: Props) {
     router.back();
   };
 
-  if (isLoading) return null;
-  if (error) return (
-    <Modal onClose={handleClose}>
-      <p>Failed to load note.</p>
-    </Modal>
-  );
-  if (!note) return (
-    <Modal onClose={handleClose}>
-      <p>Note not found.</p>
-    </Modal>
-  );
+  if (isLoading) {
+    return (
+      <Modal onClose={handleClose}>
+        <p>Loading note...</p>
+      </Modal>
+    );
+  }
+  if (error) {
+    return (
+      <Modal onClose={handleClose}>
+        <p>Failed to load note.</p>
+      </Modal>
+    );
+  }
+  if (!note) {
+    return (
+      <Modal onClose={handleClose}>
+        <p>Note not found.</p>
+      </Modal>
+    );
+  }
 
   return (
     <Modal onClose={handleClose}>
